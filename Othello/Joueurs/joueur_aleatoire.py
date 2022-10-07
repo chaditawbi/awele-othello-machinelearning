@@ -1,0 +1,63 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import sys
+sys.path.append("../..")
+import game
+
+import random
+
+tmp=0
+
+def saisieCoup(jeu):
+	global tmp
+	""" jeu -> coup
+		Retourne un coup a jouer
+	"""
+	coupsValides = game.getCoupsValides(jeu)
+	#print("Liste des coups jouables: "+str(coupsValides))
+	#if len(coupsValides) > 0:
+	if tmp<=4:
+		tmp+=1
+		return random.choice(coupsValides)
+	else:
+		return decision(jeu,coupsValides)
+
+
+
+def decision(jeu, lstCoupsValides):
+	bestScore = -1000
+	bestCoup = []
+
+	for i in range(len(lstCoupsValides)):
+		currCoup = lstCoupsValides[i]
+
+		scoreGained = estimation(jeu, currCoup)
+
+		if scoreGained >= bestScore:
+			bestCoup = currCoup
+			
+	return bestCoup
+
+
+def estimation(jeu, coup):
+	jeuCpy = game.getCopieJeu(jeu)
+
+	currEval = evaluation(jeuCpy, coup)
+
+
+	game.joueCoup(jeuCpy, coup)
+
+
+	finalEval = evaluation(jeuCpy, coup)
+
+	return currEval + finalEval
+
+
+def scoreDiff(jeu):
+	scores = game.getScores(jeu)
+	return scores[1] - scores[0]
+
+def evaluation(jeu, coup):
+	diffScores = scoreDiff(jeu)
+
+	return diffScores
